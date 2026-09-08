@@ -1,0 +1,16 @@
+package com.brunonegro.cart_service.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class CartNotFoundException extends RuntimeException {
+
+    public CartNotFoundException(Long id) {
+        super("Cart not found with id " + id);
+    }
+
+    public CartNotFoundException(String message) {
+        super(message);
+    }
+}

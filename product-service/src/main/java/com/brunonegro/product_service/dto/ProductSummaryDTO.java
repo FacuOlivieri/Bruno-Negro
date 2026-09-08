@@ -13,6 +13,6 @@ public class ProductSummaryDTO {
 
     private String code;
     private String productName;
-    private String unitPrice;
+    private double unitPrice;
     private String brand;
 }
