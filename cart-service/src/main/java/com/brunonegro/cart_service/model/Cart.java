@@ -21,11 +21,9 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCart;
-
     private Long idUser;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<CartProduct> productList = new ArrayList<>();
+    private List<ProductDetail> productList = new ArrayList<>();
 
 }

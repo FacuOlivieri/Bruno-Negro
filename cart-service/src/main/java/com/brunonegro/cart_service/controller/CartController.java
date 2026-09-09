@@ -1,7 +1,10 @@
 package com.brunonegro.cart_service.controller;
 
 import com.brunonegro.cart_service.dto.CartDTO;
+import com.brunonegro.cart_service.dto.CartProductRequestDTO;
 import com.brunonegro.cart_service.dto.CartRequestDTO;
+import com.brunonegro.cart_service.dto.ProductDTO;
+import com.brunonegro.cart_service.model.Cart;
 import com.brunonegro.cart_service.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,10 +51,10 @@ public class CartController {
 
     ///////////////////////////////////      PUT     ///////////////////////////////////
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/add")
     @ResponseStatus(HttpStatus.OK)
-    public CartDTO update(@PathVariable Long id, @RequestBody CartRequestDTO request) {
-        return cartService.update(id, request);
+    public CartDTO addProductToCart(@PathVariable Long idCart,@RequestBody CartProductRequestDTO productRequest) {
+        Cart cart = cartService.addProductToCart(idCart, productRequest);
     }
 
 

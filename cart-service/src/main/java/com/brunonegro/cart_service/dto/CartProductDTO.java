@@ -15,7 +15,4 @@ public class CartProductDTO {
     private Long idProduct;
     private int quantity;
 
-    // TODO: integracion con product-service.
-    // Agregar aca los campos que vienen de product-service (productName, unitPrice,
-    // subtotal) cuando este el cliente Feign. Ver CartMapper.toProductDto.
 }

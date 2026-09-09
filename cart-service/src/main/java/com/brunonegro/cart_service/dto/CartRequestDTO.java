@@ -1,18 +1,12 @@
 package com.brunonegro.cart_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.List;
-
-@Data
+@Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartRequestDTO {
 
     private Long idUser;
-    private List<CartProductRequestDTO> productList;
 }

@@ -1,13 +1,11 @@
 package com.brunonegro.cart_service.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.brunonegro.cart_service.model.ProductDetail;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,8 +13,6 @@ public class CartDTO {
 
     private Long idCart;
     private Long idUser;
-    private List<CartProductDTO> productList;
-
-    // TODO: integracion con product-service.
-    // Agregar aca un campo "total" cuando se traigan los precios de product-service.
+    private List<ProductDetailDTO> productList;
+    private double total;
 }
