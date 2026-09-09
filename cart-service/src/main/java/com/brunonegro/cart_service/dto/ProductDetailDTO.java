@@ -14,5 +14,10 @@ public class ProductDetailDTO {
     private Long idProduct;
     private int productQuantity;
 
+    //Datos vivos del product-service, NO se persisten en la BD del carrito
+    private String productName;
+    private double unitPrice;
+    private double subtotal;
+
 
 }

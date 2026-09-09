@@ -7,6 +7,5 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartRequestDTO {
-
     private Long idUser;
 }
