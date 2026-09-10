@@ -26,7 +26,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductDTO findById(int id) {
+    public ProductDTO findById(int id) throws ProductNotFoundException {
         return ProductMapper.toDto(findEntityOrThrow(id));
     }
 

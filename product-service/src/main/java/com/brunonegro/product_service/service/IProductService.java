@@ -10,7 +10,7 @@ public interface IProductService {
 
     List<ProductDTO> findAll();
 
-    ProductDTO findById(int id);
+    ProductDTO findById(int id) throws Exception;
 
     ProductDTO findByCode(String code);
 

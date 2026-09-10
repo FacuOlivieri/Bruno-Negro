@@ -66,7 +66,7 @@ public class SaleService implements ISaleService {
     @Override
     public SaleDTO save(Long idCart) {
         CartDTO foundCart = cartAPI.findById(idCart);
-        
+
         //Guarda datos de entidad en BD
         Sale sale = new Sale();
         sale.setIdClient(foundCart.getIdUser());
