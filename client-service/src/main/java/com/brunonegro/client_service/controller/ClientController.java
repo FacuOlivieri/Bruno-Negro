@@ -2,6 +2,7 @@ package com.brunonegro.client_service.controller;
 
 import com.brunonegro.client_service.dto.ClientRequestDTO;
 import com.brunonegro.client_service.dto.ClientDTO;
+import com.brunonegro.client_service.dto.ClientForSaleResponseDTO;
 import com.brunonegro.client_service.dto.LoginDTO;
 import com.brunonegro.client_service.service.ClientService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,12 @@ public class ClientController {
     @ResponseStatus(HttpStatus.OK)
     public ClientDTO findById(@PathVariable long id) {
         return clientService.findById(id);
+    }
+
+    @GetMapping("/find/{id}/for-sale")
+    @ResponseStatus(HttpStatus.OK)
+    public ClientForSaleResponseDTO findForSaleById(@PathVariable long id) {
+        return clientService.findForSaleById(id);
     }
 
     @GetMapping("/find/email")

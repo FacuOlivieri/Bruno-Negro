@@ -1,6 +1,7 @@
 package com.brunonegro.client_service.service;
 
 import com.brunonegro.client_service.dto.ClientDTO;
+import com.brunonegro.client_service.dto.ClientForSaleResponseDTO;
 import com.brunonegro.client_service.dto.ClientRequestDTO;
 import com.brunonegro.client_service.dto.LoginDTO;
 import com.brunonegro.client_service.exception.ClientNotFoundException;
@@ -31,6 +32,13 @@ public class ClientService implements IClientService {
     @Transactional(readOnly = true)
     public ClientDTO findById(long id) {
         return getClientOrThrow(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ClientForSaleResponseDTO findForSaleById(long id) {
+        return clientRepository.findByIdClient(id)
+                .orElseThrow(() -> new ClientNotFoundException(id));
     }
 
     @Override
