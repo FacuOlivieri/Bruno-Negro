@@ -19,13 +19,13 @@ public class SaleController {
 
     @GetMapping("/find/all")
     @ResponseStatus(HttpStatus.OK)
-    public List<Sale> findAll() {
+    public List<SaleDTO> findAll() {
         return saleService.findAll();
     }
 
     @GetMapping("/find/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Sale findById(@PathVariable Long id) {
+    public SaleDTO findById(@PathVariable Long id) {
         return saleService.findById(id);
     }
 
@@ -37,7 +37,7 @@ public class SaleController {
 
     @PutMapping("/update/{idSale}")
     @ResponseStatus(HttpStatus.OK)
-    public Sale update(@PathVariable Long idSale, @RequestBody Sale sale) {
+    public SaleDTO update(@PathVariable Long idSale, @RequestBody SaleDTO sale) {
         return saleService.update(idSale, sale);
     }
 

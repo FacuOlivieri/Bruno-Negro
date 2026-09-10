@@ -1,6 +1,7 @@
 package com.brunonegro.sale_service.service;
 
 import com.brunonegro.sale_service.dto.CartDTO;
+import com.brunonegro.sale_service.dto.ClientForSaleResponseDTO;
 import com.brunonegro.sale_service.dto.SaleDTO;
 import com.brunonegro.sale_service.exception.SaleNotFoundException;
 import com.brunonegro.sale_service.model.Sale;
@@ -10,6 +11,7 @@ import com.brunonegro.sale_service.repository.ISaleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SaleService implements ISaleService {
@@ -24,32 +26,48 @@ public class SaleService implements ISaleService {
     @Autowired
     private IClientAPI clientAPI;
 
-    /*
-     *
-     * Corregir: que devuelva un DTO
-     *
-     */
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public Sale findById(long id) {
-        return saleRepository.findById(id).orElse(null);
+    public SaleDTO findById(long id) {
+        Sale foundSale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("No se encuentra la venta recien realizada en la base de datos"));
+        ClientForSaleResponseDTO clientData = clientAPI.findForSaleById(foundSale.getIdSale());
+        CartDTO foundCart = cartAPI.findById(foundSale.getIdCart());
+
+        return SaleDTO.builder()
+                .idSale(foundSale.getIdSale())
+                .saleDate(foundSale.getSaleDate())
+                .clientData(clientData)
+                .cart(foundCart)
+                .build();
     }
 
-    /*
-     *
-     * Corregir: que devuelva un DTO
-     *
-     */
 
     @Override
-    public List<Sale> findAll() {
-        return saleRepository.findAll();
+    public List<SaleDTO> findAll() {
+        List<Sale> sales = saleRepository.findAll();
+        List<SaleDTO> salesDTOS = new ArrayList<>();
+
+        for(Sale sale : sales){
+            SaleDTO saleDTO = SaleDTO.builder()
+                    .idSale(sale.getIdSale())
+                    .saleDate(sale.getSaleDate())
+                    .clientData(clientAPI.findForSaleById(sale.getIdSale()))
+                    .cart(cartAPI.findById(sale.getIdSale()))
+                    .build();
+
+            salesDTOS.add(saleDTO);
+        }
+
+        return salesDTOS;
+
     }
 
     @Override
     public SaleDTO save(Long idCart) {
         CartDTO foundCart = cartAPI.findById(idCart);
-
+        
+        //Guarda datos de entidad en BD
         Sale sale = new Sale();
         sale.setIdClient(foundCart.getIdUser());
         sale.setIdCart(idCart);
@@ -75,22 +93,32 @@ public class SaleService implements ISaleService {
 
     @Override
     public void delete(Long idSale) {
-        saleRepository.deleteById(idSale);
+        Sale sale = saleRepository.findById(idSale)
+                .orElseThrow(() -> new SaleNotFoundException("No se encuentra la venta en la base de datos"));
+        saleRepository.deleteById(sale.getIdSale());
     }
 
-    /*
-    *
-    * Corregir: que devuelva un DTO
-    *
-    */
 
     @Override
-    public Sale update(Long idSale, Sale sale) {
-        Sale saleToUpdate = saleRepository.findById(idSale).orElse(sale);
-        saleToUpdate.setIdCart(sale.getIdCart());
-        sale.setSaleDate(saleToUpdate.getSaleDate());
+    public SaleDTO update(Long idSale, SaleDTO sale) {
+        Sale saleToUpdate = saleRepository.findById(idSale)
+                .orElseThrow(() -> new SaleNotFoundException("No se encuentra la venta en la base de datos"));
 
-        return saleRepository.save(sale);
+        //Guardamos en BD la entidad
+        saleToUpdate.setIdCart(sale.getIdSale());
+        saleToUpdate.setSaleDate(sale.getSaleDate());
+        saleToUpdate.setIdCart(sale.getCart().getIdCart());
+        saleToUpdate.setIdClient(sale.getCart().getIdUser());
+        saleToUpdate.setTotalPrice(sale.getCart().getTotal());
+        saleRepository.save(saleToUpdate);
+
+        //Retornamos DTO del mismo
+        return SaleDTO.builder()
+                .idSale(saleToUpdate.getIdSale())
+                .saleDate(saleToUpdate.getSaleDate())
+                .clientData(clientAPI.findForSaleById(saleToUpdate.getIdClient()))
+                .cart(sale.getCart())
+                .build();
     }
 
 
