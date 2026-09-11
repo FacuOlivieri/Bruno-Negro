@@ -39,6 +39,8 @@ public class ClientService implements IClientService {
     public ClientForSaleResponseDTO findForSaleById(long id) {
         return clientRepository.findByIdClient(id)
                 .orElseThrow(() -> new ClientNotFoundException(id));
+
+        ///Probar la seguidilla desde Sale, a ver si sale por GlobalExceptionHandler
     }
 
     @Override

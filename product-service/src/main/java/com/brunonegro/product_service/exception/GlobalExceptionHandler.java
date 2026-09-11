@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
+    /*
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleProductNotFound(ProductNotFoundException e,
                                                               HttpServletRequest request) {
@@ -24,4 +24,18 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+    */
+
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ProductNotFoundResponse> handleProductNotFound(ProductNotFoundException e, HttpServletRequest request) {
+        ProductNotFoundResponse error = ProductNotFoundResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .mensaje(e.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
 }
