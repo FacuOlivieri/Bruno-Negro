@@ -3,17 +3,22 @@ package com.brunonegro.sale_service.service;
 import com.brunonegro.sale_service.dto.CartDTO;
 import com.brunonegro.sale_service.dto.ClientForSaleResponseDTO;
 import com.brunonegro.sale_service.dto.SaleDTO;
+import com.brunonegro.sale_service.exception.CartNotFoundException;
+import com.brunonegro.sale_service.exception.ClientNotFoundException;
 import com.brunonegro.sale_service.exception.SaleNotFoundException;
 import com.brunonegro.sale_service.model.Sale;
 import com.brunonegro.sale_service.repository.ICartAPI;
 import com.brunonegro.sale_service.repository.IClientAPI;
 import com.brunonegro.sale_service.repository.ISaleRepository;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class SaleService implements ISaleService {
 
 
@@ -31,8 +36,8 @@ public class SaleService implements ISaleService {
     @Override
     public SaleDTO findById(long id) {
         Sale foundSale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("No se encuentra la venta recien realizada en la base de datos"));
-        ClientForSaleResponseDTO clientData = clientAPI.findForSaleById(foundSale.getIdSale());
-        CartDTO foundCart = cartAPI.findById(foundSale.getIdCart());
+        ClientForSaleResponseDTO clientData = findClientOrThrow(foundSale.getIdClient());
+        CartDTO foundCart = findCartOrThrow(foundSale.getIdCart());
 
         return SaleDTO.builder()
                 .idSale(foundSale.getIdSale())
@@ -46,14 +51,19 @@ public class SaleService implements ISaleService {
     @Override
     public List<SaleDTO> findAll() {
         List<Sale> sales = saleRepository.findAll();
+
+        if (sales.isEmpty()) {
+            throw new SaleNotFoundException("No se encuentran ventas registradas");
+        }
+
         List<SaleDTO> salesDTOS = new ArrayList<>();
 
         for(Sale sale : sales){
             SaleDTO saleDTO = SaleDTO.builder()
                     .idSale(sale.getIdSale())
                     .saleDate(sale.getSaleDate())
-                    .clientData(clientAPI.findForSaleById(sale.getIdSale()))
-                    .cart(cartAPI.findById(sale.getIdSale()))
+                    .clientData(findClientOrThrow(sale.getIdClient()))
+                    .cart(findCartOrThrow(sale.getIdCart()))
                     .build();
 
             salesDTOS.add(saleDTO);
@@ -65,7 +75,7 @@ public class SaleService implements ISaleService {
 
     @Override
     public SaleDTO save(Long idCart) {
-        CartDTO foundCart = cartAPI.findById(idCart);
+        CartDTO foundCart = findCartOrThrow(idCart);
 
         //Guarda datos de entidad en BD
         Sale sale = new Sale();
@@ -84,7 +94,7 @@ public class SaleService implements ISaleService {
         return SaleDTO.builder()
                 .idSale(saleJustCreated.getIdSale())
                 .saleDate(saleJustCreated.getSaleDate())
-                .clientData(clientAPI.findForSaleById(saleJustCreated.getIdClient()))
+                .clientData(findClientOrThrow(saleJustCreated.getIdClient()))
                 .cart(foundCart)
                 .build();
 
@@ -105,7 +115,6 @@ public class SaleService implements ISaleService {
                 .orElseThrow(() -> new SaleNotFoundException("No se encuentra la venta en la base de datos"));
 
         //Guardamos en BD la entidad
-        saleToUpdate.setIdCart(sale.getIdSale());
         saleToUpdate.setSaleDate(sale.getSaleDate());
         saleToUpdate.setIdCart(sale.getCart().getIdCart());
         saleToUpdate.setIdClient(sale.getCart().getIdUser());
@@ -116,13 +125,34 @@ public class SaleService implements ISaleService {
         return SaleDTO.builder()
                 .idSale(saleToUpdate.getIdSale())
                 .saleDate(saleToUpdate.getSaleDate())
-                .clientData(clientAPI.findForSaleById(saleToUpdate.getIdClient()))
+                .clientData(findClientOrThrow(saleToUpdate.getIdClient()))
                 .cart(sale.getCart())
                 .build();
     }
 
 
+    ////////////////////////////////  Traduccion de fallas remotas  ////////////////////////////////
 
+    /*
+     * Feign lanza FeignException ante cualquier respuesta que no sea 2xx: nunca devuelve null.
+     * Por eso el 404 del servicio remoto se atrapa y se traduce a una excepcion del dominio.
+     * Las demas FeignException (servicio caido, timeout) suben y las toma el GlobalExceptionHandler.
+     */
+    private CartDTO findCartOrThrow(Long idCart) {
+        try {
+            return cartAPI.findById(idCart);
+        } catch (FeignException.NotFound e) {
+            throw new CartNotFoundException(idCart);
+        }
+    }
+
+    private ClientForSaleResponseDTO findClientOrThrow(Long idClient) {
+        try {
+            return clientAPI.findForSaleById(idClient);
+        } catch (FeignException.NotFound e) {
+            throw new ClientNotFoundException(idClient);
+        }
+    }
 
 
 }

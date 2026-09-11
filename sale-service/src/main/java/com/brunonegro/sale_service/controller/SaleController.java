@@ -31,7 +31,7 @@ public class SaleController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public SaleDTO create(@RequestParam LocalDate saleDate, Long idCarrito) {
+    public SaleDTO create(@RequestParam Long idCarrito) {
         return saleService.save(idCarrito);
     }
 

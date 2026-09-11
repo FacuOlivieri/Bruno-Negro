@@ -3,7 +3,7 @@ spring:
     name: sale-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/BN_productos?createDatabaseIfNotExist=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/BN_sales?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: ${DB_USER:root}
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
