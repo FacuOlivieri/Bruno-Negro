@@ -73,7 +73,6 @@ public class CartService implements ICartService {
             clientValidator.validateExists(request.getIdUser());
 
             Cart newCart = new Cart();
-
             newCart.setIdUser(request.getIdUser());
             newCart.setProductList(new ArrayList<>());
             cartRepository.save(newCart);
