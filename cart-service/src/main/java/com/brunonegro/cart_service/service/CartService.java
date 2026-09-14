@@ -13,6 +13,8 @@ import com.brunonegro.cart_service.repository.ICartRepository;
 import com.brunonegro.cart_service.repository.IProductAPI;
 import com.brunonegro.cart_service.validator.ClientValidator;
 import feign.FeignException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,6 +98,8 @@ public class CartService implements ICartService {
     //Agrega un producto al carrito, o le suma cantidad si ya estaba, y devuelve el carrito recalculado
     @Override
     @Transactional
+    @CircuitBreaker(name = "product-service", fallbackMethod = "fallbackCartDTO")
+    @Retry(name = "product-service")
     public CartDTO addProductToCart(Long idCart, CartProductRequestDTO productRequest) {
         validateQuantity(productRequest.getQuantity());
         Cart clientCart = findEntityOrThrow(idCart);
@@ -148,6 +152,8 @@ public class CartService implements ICartService {
     }
 
     //Convierte una linea del carrito en DTO con el nombre y el subtotal del momento
+
+
     private ProductDetailDTO recalculateDetail(ProductDetail detail) {
         ProductDTO product = findProductOrThrow(detail.getIdProduct());
         double unitPrice = PricesHelper.calculatePriceWithDescount(product);
@@ -202,4 +208,19 @@ public class CartService implements ICartService {
                 .cart(cart)
                 .build();
     }
+
+
+    //////////////////////// Fallback Method para Circuit Breaker
+    private CartDTO fallbackCartDTO (Long idCart, CartProductRequestDTO productRequest, Throwable throwable) {
+        return CartDTO.builder()
+                .idCart(0L)
+                .idUser(0L)
+                .productList(new ArrayList<>())
+                .total(0.0)
+                .build();
+
+    }
+
+
+
 }

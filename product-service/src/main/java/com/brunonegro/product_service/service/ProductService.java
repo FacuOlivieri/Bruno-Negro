@@ -9,6 +9,7 @@ import com.brunonegro.product_service.model.Product;
 import com.brunonegro.product_service.repository.IProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,9 @@ import java.util.List;
 
 @Service
 public class ProductService implements IProductService {
+
+    @Value("${server.port}")
+    private int serverPort;
 
     @Autowired
     private IProductRepository productRepository;
@@ -25,8 +29,11 @@ public class ProductService implements IProductService {
         return ProductMapper.toDtoList(productRepository.findAll());
     }
 
+
+
     @Override
     public ProductDTO findById(int id) throws ProductNotFoundException {
+        System.out.println("este producto se consulto por el puerto: " + serverPort);
         return ProductMapper.toDto(findEntityOrThrow(id));
     }
 
