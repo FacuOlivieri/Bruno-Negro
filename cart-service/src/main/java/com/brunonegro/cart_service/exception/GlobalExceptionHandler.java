@@ -36,6 +36,11 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleServiceUnavailable(ServiceUnavailableException e, HttpServletRequest request) {
+        return build(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage(), request);
+    }
+
     ///////////////////////////////// 502 / 500 //////////////////////////////
 
     /*
