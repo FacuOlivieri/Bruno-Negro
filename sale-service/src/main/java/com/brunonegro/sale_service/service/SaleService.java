@@ -6,6 +6,7 @@ import com.brunonegro.sale_service.dto.ProductDetailDTO;
 import com.brunonegro.sale_service.dto.SaleDTO;
 import com.brunonegro.sale_service.exception.CartNotFoundException;
 import com.brunonegro.sale_service.exception.ClientNotFoundException;
+import com.brunonegro.sale_service.exception.EmptyCartException;
 import com.brunonegro.sale_service.exception.SaleNotFoundException;
 import com.brunonegro.sale_service.mapper.SaleMapper;
 import com.brunonegro.sale_service.model.Sale;
@@ -13,14 +14,18 @@ import com.brunonegro.sale_service.repository.ICartAPI;
 import com.brunonegro.sale_service.repository.IClientAPI;
 import com.brunonegro.sale_service.repository.ISaleRepository;
 import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class SaleService implements ISaleService {
 
@@ -69,6 +74,7 @@ public class SaleService implements ISaleService {
     @Transactional
     public SaleDTO save(Long idCart) {
         CartDTO foundCart = findCartOrThrow(idCart);
+        validateNotEmpty(foundCart, idCart);
 
         Sale sale = new Sale();
         sale.setIdCart(idCart);
@@ -77,6 +83,8 @@ public class SaleService implements ISaleService {
 
         //save devuelve la entidad ya con su id: no hace falta volver a buscarla
         Sale savedSale = saleRepository.save(sale);
+
+        clearCartAfterCommit(idCart);
 
         return SaleMapper.toDto(savedSale, findClientOrThrow(savedSale.getIdClient()));
     }
@@ -99,6 +107,7 @@ public class SaleService implements ISaleService {
                 .orElseThrow(() -> new SaleNotFoundException("No se encuentra la venta en la base de datos"));
 
         CartDTO foundCart = findCartOrThrow(sale.getIdCart());
+        validateNotEmpty(foundCart, sale.getIdCart());
 
         if (sale.getSaleDate() != null) {
             saleToUpdate.setSaleDate(sale.getSaleDate());
@@ -114,6 +123,13 @@ public class SaleService implements ISaleService {
 
     ////////////////////////////////  Foto del carrito  ////////////////////////////////
 
+    //Corta antes de guardar nada: una venta sin productos no tiene sentido
+    private void validateNotEmpty(CartDTO cart, Long idCart) {
+        if (cart.getProductList() == null || cart.getProductList().isEmpty()) {
+            throw new EmptyCartException(idCart);
+        }
+    }
+
     //Copia cliente, total y lineas del carrito a la venta. Reemplaza las lineas anteriores si las habia
     private void applyCartSnapshot(Sale sale, CartDTO cart) {
         sale.setIdClient(cart.getIdUser());
@@ -124,6 +140,28 @@ public class SaleService implements ISaleService {
         for (ProductDetailDTO cartLine : cart.getProductList()) {
             sale.getDetails().add(SaleMapper.toDetailEntity(cartLine, sale));
         }
+    }
+
+
+    ////////////////////////////////  Vaciado del carrito  ////////////////////////////////
+
+    /*
+     * El carrito vive en otra base: no hay una transaccion que cubra venta y carrito juntos.
+     * Por eso se vacia recien DESPUES del commit de la venta:
+     *  - si el commit falla, nunca se llega a vaciar -> el cliente no pierde su carrito.
+     *  - si cart-service falla, la venta ya quedo guardada con su foto -> se loguea y no se revierte.
+     */
+    private void clearCartAfterCommit(Long idCart) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                try {
+                    cartAPI.clear(idCart);
+                } catch (FeignException e) {
+                    log.warn("Sale saved but cart {} could not be cleared: {}", idCart, e.getMessage());
+                }
+            }
+        });
     }
 
 

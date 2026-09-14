@@ -18,6 +18,8 @@ public interface ICartService {
 
     void delete(Long id);
 
+    void clear(Long idCart);
+
     CartDTO addProductToCart(Long idCart, CartProductRequestDTO productRequest);
 
     CartDTO deleteProductFromList(Long idCart, Long idProduct);

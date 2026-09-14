@@ -64,6 +64,12 @@ public class CartController {
         cartService.delete(id);
     }
 
+    @DeleteMapping("/clear/{idCart}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void clear(@PathVariable Long idCart) {
+        cartService.clear(idCart);
+    }
+
     @DeleteMapping("/delete/{idCart}/product/{idProduct}")
     @ResponseStatus(HttpStatus.OK)
     public CartDTO deleteProductFromList(@PathVariable Long idCart, @PathVariable Long idProduct) {

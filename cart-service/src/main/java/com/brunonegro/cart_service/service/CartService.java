@@ -93,6 +93,17 @@ public class CartService implements ICartService {
         cartRepository.deleteById(id);
     }
 
+    //Vacia el carrito pero lo deja vivo para el cliente. Vaciar uno ya vacio no es error (idempotente)
+    @Override
+    @Transactional
+    public void clear(Long idCart) {
+        Cart clientCart = findEntityOrThrow(idCart);
+
+        //orphanRemoval = true -> clear() alcanza para que se borren las lineas en la BD
+        clientCart.getProductList().clear();
+        cartRepository.save(clientCart);
+    }
+
     ///////////////////////////////// PUT //////////////////////////////
 
     //Agrega un producto al carrito, o le suma cantidad si ya estaba, y devuelve el carrito recalculado

@@ -27,6 +27,13 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
+    //////////////////////////////////////////   400   //////////////////////////////////////////
+
+    @ExceptionHandler(EmptyCartException.class)
+    public ResponseEntity<ErrorHandler> handleEmptyCart(EmptyCartException exception, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
     //////////////////////////////////////////   502 / 500   //////////////////////////////////////////
 
     /*
