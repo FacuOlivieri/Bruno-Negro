@@ -6,17 +6,13 @@ import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/*
- * Validaciones del carrito que necesitan preguntarle a client-service.
- * OJO: esta clase hace I/O (llama por Feign), no valida solo con datos en memoria.
- */
+
 @Component
 public class ClientValidator {
 
     @Autowired
     private IClientAPI clientAPI;
 
-    //Corta la operacion si el cliente no existe en client-service
     public void validateExists(Long idClient) {
         try {
             clientAPI.findById(idClient);

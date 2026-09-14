@@ -13,7 +13,7 @@ public class SaleDTO {
 
     private Long idSale;
     private LocalDate saleDate;
-    private ClientForSaleResponseDTO clientData;       //Buscarlo a traves de la API de clientes
+    private ClientForSaleResponseDTO clientData;
     private CartDTO cart;
 
     /*

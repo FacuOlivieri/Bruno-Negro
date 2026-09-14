@@ -20,6 +20,10 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
+
+    /////////////////////// Get ///////////////////////
+
+
     @GetMapping("/find/all")
     @ResponseStatus(HttpStatus.OK)
     public List<ClientDTO> findAll() {
@@ -44,11 +48,15 @@ public class ClientController {
         return clientService.findByEmail(email);
     }
 
-    @GetMapping("/loginRequest")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public boolean loginRequest(@RequestBody LoginDTO login){
-        return clientService.loginAutentification(login);
-    }
+
+
+
+
+
+    /////////////////////// Post ///////////////////////
+
+
+
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -56,11 +64,25 @@ public class ClientController {
         return clientService.create(request);
     }
 
+    @PostMapping("/loginRequest")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public boolean loginRequest(@RequestBody LoginDTO login){
+        return clientService.loginAutentification(login);
+    }
+
+    /////////////////////// Put ///////////////////////
+
+
     @PutMapping("/update/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ClientDTO update(@PathVariable long id, @RequestBody ClientRequestDTO request) {
         return clientService.update(id, request);
     }
+
+
+
+    /////////////////////// Delete ///////////////////////
+
 
     @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
