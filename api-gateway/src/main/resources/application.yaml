@@ -4,9 +4,18 @@ spring:
 
   cloud:
     gateway:
-      discovery:
-        locator: true
-        lower-case-service-id: true
-        
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+
 server:
-    port: 443
+    port: 80
+
+
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://localhost:8761/eureka
