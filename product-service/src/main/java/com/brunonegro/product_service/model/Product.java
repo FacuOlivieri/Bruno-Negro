@@ -1,9 +1,6 @@
 package com.brunonegro.product_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -20,7 +17,11 @@ public class Product {
     private String productName;
     private String description;
     private double unitPrice;
-    private String category;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_category", nullable = false)
+    private Category category;
+
     private String imageUrl;
     private String brand;
     private float firstDescount;

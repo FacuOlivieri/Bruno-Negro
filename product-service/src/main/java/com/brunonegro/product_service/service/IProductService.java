@@ -14,6 +14,8 @@ public interface IProductService {
 
     ProductDTO findByCode(String code);
 
+    List<ProductDTO> findAllByCategory(String category);
+
     List<ProductSummaryDTO> findAllSummary();
 
     ProductSummaryDTO findSummaryById(int id);

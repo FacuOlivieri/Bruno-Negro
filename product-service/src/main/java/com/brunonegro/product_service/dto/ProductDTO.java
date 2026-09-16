@@ -16,7 +16,7 @@ public class ProductDTO {
     private String productName;
     private String description;
     private double unitPrice;
-    private String category;
+    private CategoryDTO category;
     private String imageUrl;
     private String brand;
     private float firstDescount;

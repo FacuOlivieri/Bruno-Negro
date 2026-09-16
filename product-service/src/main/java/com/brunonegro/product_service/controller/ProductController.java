@@ -45,6 +45,12 @@ public class ProductController {
         return productService.findAllByCategoryAndBrand(category, brand);
     }
 
+    @GetMapping("/find/category")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ProductDTO> findByCategory(@RequestParam String category) {
+        return productService.findAllByCategory(category);
+    }
+
 
     ///////////////////////////////////      GET: Filtro de Productos SUMMARY     ///////////////////////////////////
 

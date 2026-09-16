@@ -3,6 +3,7 @@ package com.brunonegro.product_service.mapper;
 import com.brunonegro.product_service.dto.ProductDTO;
 import com.brunonegro.product_service.dto.ProductRequestDTO;
 import com.brunonegro.product_service.dto.ProductSummaryDTO;
+import com.brunonegro.product_service.model.Category;
 import com.brunonegro.product_service.model.Product;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public final class ProductMapper {
                 .productName(product.getProductName())
                 .description(product.getDescription())
                 .unitPrice(product.getUnitPrice())
-                .category(product.getCategory())
+                .category(CategoryMapper.toDto(product.getCategory()))
                 .imageUrl(product.getImageUrl())
                 .brand(product.getBrand())
                 .firstDescount(product.getFirstDescount())
@@ -55,7 +56,8 @@ public final class ProductMapper {
                 .toList();
     }
 
-    public static Product toEntity(ProductRequestDTO dto) {
+    //La categoria llega ya resuelta desde el service: el mapper no busca en la BD
+    public static Product toEntity(ProductRequestDTO dto, Category category) {
         if (dto == null) {
             return null;
         }
@@ -64,7 +66,7 @@ public final class ProductMapper {
                 .productName(dto.getProductName())
                 .description(dto.getDescription())
                 .unitPrice(dto.getUnitPrice())
-                .category(dto.getCategory())
+                .category(category)
                 .imageUrl(dto.getImageUrl())
                 .brand(dto.getBrand())
                 .firstDescount(dto.getFirstDescount())

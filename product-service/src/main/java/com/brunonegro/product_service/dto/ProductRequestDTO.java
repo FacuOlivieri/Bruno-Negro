@@ -15,7 +15,7 @@ public class ProductRequestDTO {
     private String productName;
     private String description;
     private double unitPrice;
-    private String category;
+    private Integer idCategory;
     private String imageUrl;
     private String brand;
     private float firstDescount;
